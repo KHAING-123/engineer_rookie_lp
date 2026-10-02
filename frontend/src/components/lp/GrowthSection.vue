@@ -82,11 +82,12 @@ const { stateClass } = useHeadingReveal(heading)
           v-for="(item, index) in growthSteps"
           :key="item.step"
           v-reveal="{ delay: 100, i: index }"
-          class="timeline__item heading-reveal-content heading-reveal-content--card"
+          class="timeline__item heading-reveal-content heading-reveal-content--card premium-icon-hover"
           :class="`accent-${item.accent || 'yellow'}`"
         >
-          <div class="timeline__marker">
-            <img :src="img(item.icon)" alt="" width="120" height="120" loading="lazy" />
+          <div class="timeline__marker premium-icon-host">
+            <span class="premium-icon-glow" aria-hidden="true"></span>
+            <img class="premium-icon-float" :src="img(item.icon)" alt="" width="120" height="120" loading="lazy" :style="{ '--pi-delay': `${index * 0.4}s` }" />
           </div>
           <div class="timeline__card lp-card">
             <!-- 右上のドット・右下の淡い弧（文字より後ろ） -->
@@ -386,6 +387,11 @@ const { stateClass } = useHeadingReveal(heading)
   box-shadow: 0 6px 16px rgba(31, 55, 95, 0.07);
   /* カードより少し遅れて、小さく浮いて脈打つ */
   animation: step-icon-pulse var(--icon-dur, 4.8s) ease-in-out var(--icon-delay, 0.5s) infinite;
+}
+.timeline__marker {
+  --pi-color: var(--step-color);
+  --pi-y: -3px; /* 丸自体もゆっくり脈打つので、画像は小さめに */
+  --pi-y-sp: -2px;
 }
 .timeline__marker img {
   width: 100%;

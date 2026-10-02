@@ -154,8 +154,9 @@ const DOTS = 15
                 <span class="iv-topic-deco__circle"></span>
                 <span class="iv-topic-deco__dot"></span>
               </span>
-              <span class="interview__topic-icon">
-                <img :src="img(topic.icon)" alt="" width="64" height="64" loading="lazy" />
+              <span class="interview__topic-icon premium-icon-host">
+                <span class="premium-icon-glow" aria-hidden="true"></span>
+                <img class="premium-icon-float" :src="img(topic.icon)" alt="" width="64" height="64" loading="lazy" :style="{ '--pi-delay': `${index * 0.4}s` }" />
               </span>
               <span class="interview__topic-text">
                 <!-- 項目名の \n は「幅が足りないときだけ改行する位置」 -->
@@ -181,7 +182,11 @@ const DOTS = 15
           <div class="interview__point-float" :style="{ '--dur': ['6.5s', '7.2s', '6.8s'][index % 3], '--delay': `${index * -1.3}s` }">
             <div class="interview__point" :class="`point--${point.accent || 'yellow'}`">
               <span class="iv-point-rays" aria-hidden="true"><span></span><span></span><span></span></span>
-              <span class="interview__point-icon"><img :src="img(point.icon)" alt="" width="64" height="64" loading="lazy" /></span>
+              <!-- 外側：位置（レイアウトは不変） / 光：ゆっくり呼吸 / 内側の丸：ゆっくり浮遊（カードの浮遊・hover とは別要素） -->
+              <span class="interview__point-icon" :style="{ '--pi-delay': `${index * 0.6}s` }">
+                <span class="iv-point-icon-glow" aria-hidden="true"></span>
+                <span class="iv-point-icon-float"><img :src="img(point.icon)" alt="" width="64" height="64" loading="lazy" /></span>
+              </span>
               <span class="interview__point-body">
                 <strong class="interview__point-title">{{ point.title }}</strong>
                 <span v-if="point.description" class="interview__point-text">{{ point.description }}</span>
@@ -874,6 +879,11 @@ const DOTS = 15
   animation: iv-topic-icon-float 6s ease-in-out calc(var(--t-i, 0) * -1.4s) infinite;
   transition: translate 0.5s cubic-bezier(0.22, 1, 0.36, 1);
 }
+.interview__topic-icon {
+  --pi-color: var(--t-line);
+  --pi-y: -2px; /* 丸自体もゆっくり浮くので、画像は小さめに */
+  --pi-y-sp: -1.5px;
+}
 .interview__topic-icon img {
   width: 56%;
   height: 56%;
@@ -1050,17 +1060,66 @@ const DOTS = 15
 .point--blue { --pt-bg: #e6f2ff; --pt-bd: #cfe4fb; --pt-icon: #cfe5fc; --pt-ray: #6fb3ee; }
 .point--green { --pt-bg: #e6f7ee; --pt-bd: #cdeedd; --pt-icon: #cdeede; --pt-ray: #5ccb9b; }
 .interview__point-icon {
-  display: grid;
-  place-items: center;
+  position: relative;
   flex-shrink: 0;
   width: 72px;
   height: 72px;
+  --pt-float: -5px;
+}
+/* 丸いアイコン：既存の色の丸のまま、テーマ色の柔らかい影で少し浮かせ、ゆっくり上下 */
+.iv-point-icon-float {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
   border-radius: 50%;
   background: var(--pt-icon);
+  box-shadow:
+    0 10px 24px color-mix(in srgb, var(--pt-ray) 22%, transparent),
+    0 4px 10px color-mix(in srgb, var(--pt-ray) 16%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.7);
+  animation: iv-point-icon-float 5.2s ease-in-out var(--pi-delay, 0s) infinite;
+  transition:
+    translate 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+    scale 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.4s ease;
 }
-.interview__point-icon img {
+.iv-point-icon-float img {
   width: 60%;
   height: 60%;
+  filter: drop-shadow(0 2px 3px color-mix(in srgb, var(--pt-ray) 22%, transparent));
+}
+/* 後ろの淡い光（アイコンより少し大きい・ゆっくり呼吸） */
+.iv-point-icon-glow {
+  position: absolute;
+  z-index: 0;
+  inset: -18%;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, color-mix(in srgb, var(--pt-ray) 45%, transparent), transparent 72%);
+  opacity: 0.35;
+  pointer-events: none;
+  animation: iv-point-icon-glow 7s ease-in-out var(--pi-delay, 0s) infinite;
+}
+@keyframes iv-point-icon-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(var(--pt-float)); }
+}
+@keyframes iv-point-icon-glow {
+  0%, 100% { transform: scale(0.95); opacity: 0.35; }
+  50% { transform: scale(1.08); opacity: 0.55; }
+}
+/* PC hover：丸がもう少しだけ上がり、影が少し強くなる（浮遊の transform とは別プロパティ） */
+@media (hover: hover) and (pointer: fine) {
+  .interview__point:hover .iv-point-icon-float {
+    translate: 0 -2px;
+    scale: 1.04;
+    box-shadow:
+      0 14px 30px color-mix(in srgb, var(--pt-ray) 28%, transparent),
+      0 6px 12px color-mix(in srgb, var(--pt-ray) 20%, transparent),
+      inset 0 1px 0 rgba(255, 255, 255, 0.7);
+  }
 }
 .interview__point-body {
   display: flex;
@@ -1260,6 +1319,21 @@ const DOTS = 15
     height: 60px;
   }
 }
+/* SP：浮遊・影・光を控えめに */
+@media (max-width: 767px) {
+  .interview__point-icon {
+    --pt-float: -2.5px;
+  }
+  .iv-point-icon-float {
+    box-shadow:
+      0 7px 16px color-mix(in srgb, var(--pt-ray) 18%, transparent),
+      0 3px 7px color-mix(in srgb, var(--pt-ray) 12%, transparent),
+      inset 0 1px 0 rgba(255, 255, 255, 0.7);
+  }
+  .iv-point-icon-glow {
+    inset: -12%;
+  }
+}
 
 @media (prefers-reduced-motion: reduce) {
   .iv-topic-deco__blob,
@@ -1311,6 +1385,8 @@ const DOTS = 15
   .iv-ndot,
   .interview__dot,
   .iv-title-rays,
+  .iv-point-icon-float,
+  .iv-point-icon-glow,
   .iv-point-rays,
   .interview__point-float,
   .iv-bg,
@@ -1322,6 +1398,10 @@ const DOTS = 15
   }
   .interview__point:hover {
     transform: none;
+  }
+  .interview__point:hover .iv-point-icon-float {
+    translate: none;
+    scale: 1;
   }
   .interview__dotted {
     -webkit-mask-image: none;

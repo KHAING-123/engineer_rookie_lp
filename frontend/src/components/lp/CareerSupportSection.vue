@@ -46,8 +46,9 @@ const { stateClass } = useHeadingReveal(heading)
                   <span class="support-card__circle support-card__circle--sm"></span>
                   <span class="support-card__wave"></span>
                 </span>
-                <div class="support-card__icon">
-                  <img :src="img(item.icon)" alt="" width="120" height="120" loading="lazy" />
+                <div class="support-card__icon premium-icon-host">
+                  <span class="premium-icon-glow" aria-hidden="true"></span>
+                  <img class="premium-icon-float" :src="img(item.icon)" alt="" width="120" height="120" loading="lazy" :style="{ '--pi-delay': `${index * 0.4}s` }" />
                 </div>
                 <h3 class="support-card__title">{{ item.title }}</h3>
                 <!-- タイトル下の短いドットライン（明るいドットが左 → 右へ流れ続ける） -->
@@ -275,6 +276,9 @@ const { stateClass } = useHeadingReveal(heading)
     translate 0.35s ease,
     scale 0.35s ease,
     box-shadow 0.35s ease;
+}
+.support-card__icon {
+  --pi-color: var(--sc);
 }
 .support-card__icon img {
   width: 100%;

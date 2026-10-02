@@ -12,7 +12,7 @@ const DUR = [5.4, 5.8, 5.5, 6, 5.7]
 
 <template>
   <article
-    class="career-card lp-card"
+    class="career-card lp-card premium-icon-hover"
     :class="`accent-${career.accent || 'yellow'}`"
     :style="{
       '--dur': `${DUR[index % DUR.length]}s`,
@@ -24,8 +24,9 @@ const DUR = [5.4, 5.8, 5.5, 6, 5.7]
   >
     <!-- 淡い光の流れ（装飾・カード内に収める） -->
     <span class="career-card__sweep" aria-hidden="true"></span>
-    <div class="career-card__icon">
-      <img :src="img(career.icon)" alt="" width="120" height="120" loading="lazy" />
+    <div class="career-card__icon premium-icon-host">
+      <span class="premium-icon-glow" aria-hidden="true"></span>
+      <img class="premium-icon-float" :src="img(career.icon)" alt="" width="120" height="120" loading="lazy" :style="{ '--pi-delay': `${index * 0.4}s` }" />
     </div>
     <h3 class="career-card__title">{{ career.title }}</h3>
     <!-- タイトル下の短いドットライン（明るいドットが左 → 右へ流れ続ける） -->
@@ -146,7 +147,10 @@ const DUR = [5.4, 5.8, 5.5, 6, 5.7]
     scale: 1.05;
   }
   .career-card__icon img {
-    transition: scale 0.35s ease;
+    transition:
+      scale 0.35s ease,
+      translate 0.35s cubic-bezier(0.2, 0.8, 0.2, 1),
+      filter 0.35s ease;
   }
 }
 
@@ -179,6 +183,11 @@ const DUR = [5.4, 5.8, 5.5, 6, 5.7]
 @keyframes career-sweep {
   0% { transform: translate3d(-60%, 30%, 0); }
   30%, 100% { transform: translate3d(60%, -30%, 0); }
+}
+.career-card__icon {
+  --pi-color: var(--cc);
+  --pi-y: -3px; /* 丸自体もゆっくり脈打つので、画像は小さめに */
+  --pi-y-sp: -2px;
 }
 .career-card__icon img {
   width: 100%;

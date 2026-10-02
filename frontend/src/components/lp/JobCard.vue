@@ -36,6 +36,17 @@ defineProps({
         <span class="our-work-card__wave"></span>
         <!-- 画像まわりの淡い光：左下 → 右上へごくゆっくり移動 -->
         <span class="our-work-card__glow"></span>
+        <!-- カード上部の Premium Floating Accent（淡い光の玉・小さな光・流れる光のライン。画像・文字より後ろ） -->
+        <span class="our-work-card__top">
+          <i class="ow-orb ow-orb--1"></i>
+          <i class="ow-orb ow-orb--2"></i>
+          <i class="ow-orb ow-orb--3"></i>
+          <i class="ow-spark ow-spark--1"></i>
+          <i class="ow-spark ow-spark--2"></i>
+          <i class="ow-spark ow-spark--3"></i>
+          <i class="ow-spark ow-spark--4"></i>
+          <i class="ow-lightline"></i>
+        </span>
       </span>
 
       <div class="our-work-card__image">
@@ -259,6 +270,72 @@ defineProps({
   0%, 100% { transform: translate3d(-6%, 22%, 0) scale(0.95); opacity: 0.7; }
   50% { transform: translate3d(40%, -6%, 0) scale(1.05); opacity: 1; }
 }
+/* ---------- カード上部の Premium Floating Accent（ごくゆっくり・カードの角丸の中だけ） ---------- */
+.our-work-card__top {
+  --d: calc(var(--i, 0) * 0.8s); /* 3枚のタイミングをずらす */
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 46%;
+}
+.our-work-card__top > i {
+  position: absolute;
+  display: block;
+}
+/* 淡い光の玉：ゆっくり左右・上下に漂い、濃さと大きさがわずかに変わる */
+.ow-orb {
+  width: 64px;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, var(--ow-glow), transparent 75%);
+  filter: blur(6px);
+  opacity: 0.6;
+  animation: ow-orb-drift 10s ease-in-out var(--d) infinite;
+}
+.ow-orb--1 { left: 8%; top: 8%; }
+.ow-orb--2 { right: 10%; top: 18%; width: 48px; animation-duration: 12s; animation-delay: calc(var(--d) - 4s); animation-direction: reverse; }
+.ow-orb--3 { left: 46%; top: 2%; width: 38px; animation-duration: 9s; animation-delay: calc(var(--d) - 7s); }
+@keyframes ow-orb-drift {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1); opacity: 0.45; }
+  50% { transform: translate3d(14px, -6px, 0) scale(1.08); opacity: 0.8; }
+}
+/* 小さな光（ドット）：少しずつ位置を変えながら、やわらかく明滅 */
+.ow-spark {
+  width: 5px;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: var(--ow-deco);
+  box-shadow: 0 0 6px var(--ow-glow);
+  opacity: 0.2;
+  animation: ow-spark-float 7s ease-in-out var(--d) infinite;
+}
+.ow-spark--1 { left: 22%; top: 12%; }
+.ow-spark--2 { left: 64%; top: 7%; width: 4px; animation-duration: 8.5s; animation-delay: calc(var(--d) - 2.5s); }
+.ow-spark--3 { right: 16%; top: 34%; width: 6px; animation-duration: 6.5s; animation-delay: calc(var(--d) - 4s); }
+.ow-spark--4 { left: 10%; top: 40%; width: 4px; animation-duration: 9s; animation-delay: calc(var(--d) - 6s); }
+@keyframes ow-spark-float {
+  0%, 100% { transform: translate3d(0, 0, 0); opacity: 0.2; }
+  50% { transform: translate3d(6px, -8px, 0); opacity: 0.7; }
+}
+/* カード上端の流れる光のライン：左 → 右へゆっくり移動し、端でふわっと消えて、また左から */
+.ow-lightline {
+  left: 0;
+  top: 7px;
+  width: 34%;
+  height: 2px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, transparent, var(--ow-deco), transparent);
+  filter: blur(0.6px);
+  opacity: 0;
+  animation: ow-lightline 9s ease-in-out var(--d) infinite;
+}
+@keyframes ow-lightline {
+  0% { transform: translateX(-40%); opacity: 0; }
+  12% { opacity: 0.7; }
+  70% { opacity: 0.7; }
+  88%, 100% { transform: translateX(260%); opacity: 0; }
+}
+
 @keyframes our-work-blob {
   0%, 100% { scale: 1; translate: 0 0; }
   50% { scale: 1.03; translate: -4px -3px; }
@@ -361,8 +438,37 @@ defineProps({
   font-size: 0.8125rem;
   font-weight: 600;
   line-height: 1.4;
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.7); /* 背景の装飾と重なっても形が分かるように */
-  transition: translate 0.3s ease;
+  /* カード表面から少し浮いて見える、テーマ色になじむ柔らかい影 */
+  --tag-base: -2px;  /* 常に少し浮かせる量 */
+  --tag-peak: -4px;  /* 浮遊のいちばん高い位置 */
+  position: relative;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.7), /* 背景の装飾と重なっても形が分かるように */
+    0 6px 14px color-mix(in srgb, var(--ow-accent) 14%, rgba(30, 55, 90, 0.06)),
+    0 2px 5px rgba(30, 55, 90, 0.05);
+  /* ゆっくりした浮遊は translate、hover は transform（別プロパティなので競合しない） */
+  translate: 0 var(--tag-base);
+  animation: ow-tag-float 5s ease-in-out var(--tag-delay, 0s) infinite;
+  transition:
+    transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1),
+    box-shadow 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+/* 上部のごく薄いハイライト（少し立体的に） */
+.our-work-card__tag::before {
+  content: '';
+  position: absolute;
+  inset: 1px 1px 45%;
+  border-radius: inherit;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0));
+  pointer-events: none;
+}
+/* 4つのタグを少しずつずらして、順番にふわっと */
+.our-work-card__tag:nth-child(2) { --tag-delay: 0.35s; }
+.our-work-card__tag:nth-child(3) { --tag-delay: 0.7s; }
+.our-work-card__tag:nth-child(4) { --tag-delay: 1.05s; }
+@keyframes ow-tag-float {
+  0%, 100% { translate: 0 var(--tag-base); }
+  50% { translate: 0 var(--tag-peak); }
 }
 
 /* ---------- PC（マウス操作）の hover ---------- */
@@ -377,7 +483,11 @@ defineProps({
       inset 0 1px 0 rgba(255, 255, 255, 0.9);
   }
   .our-work-card__tag:hover {
-    translate: 0 -1px;
+    transform: translateY(-4px) scale(1.03); /* 浮遊の -2px と合わせて約 -6px */
+    box-shadow:
+      inset 0 0 0 1px rgba(255, 255, 255, 0.75),
+      0 10px 20px color-mix(in srgb, var(--ow-accent) 20%, rgba(30, 55, 90, 0.08)),
+      0 3px 7px rgba(30, 55, 90, 0.06);
   }
   .our-work-card:hover .our-work-card__image-zoom {
     transform: scale(1.02);
@@ -400,6 +510,21 @@ defineProps({
   .our-work-card__dots--bottom {
     display: none;
   }
+  /* カード上部の装飾：小さく・数を減らし・ぼかしを弱く */
+  .ow-orb {
+    width: 48px;
+    filter: blur(4px);
+  }
+  .ow-orb--2 { width: 36px; }
+  .ow-orb--3,
+  .ow-spark--4 {
+    display: none;
+  }
+  /* タグの浮遊を控えめに */
+  .our-work-card__tag {
+    --tag-base: -1px;
+    --tag-peak: -2.5px;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -407,14 +532,22 @@ defineProps({
   .our-work-card::before,
   .our-work-card__image-float,
   .our-work-card__deco > *,
-  .our-work-card__accent::after {
+  .our-work-card__accent::after,
+  .our-work-card__top > i {
     animation: none;
+  }
+  .ow-lightline {
+    display: none;
   }
   .our-work-card__accent::after {
     display: none;
   }
   .our-work-card__tag {
     transition: none;
+    animation: none;
+  }
+  .our-work-card__tag:hover {
+    transform: none;
   }
   .our-work-card__surface,
   .our-work-card__image-zoom,
