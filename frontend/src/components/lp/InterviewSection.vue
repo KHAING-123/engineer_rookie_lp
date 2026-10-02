@@ -147,13 +147,21 @@ const DOTS = 15
             :style="{ '--t-i': index }"
           >
             <div class="interview__topic-card">
+              <!-- カード端の淡い装飾（角の Blob・丸・波・ドット。文字より後ろ） -->
+              <span class="iv-topic-deco" aria-hidden="true">
+                <span class="iv-topic-deco__blob"></span>
+                <span class="iv-topic-deco__wave"></span>
+                <span class="iv-topic-deco__circle"></span>
+                <span class="iv-topic-deco__dot"></span>
+              </span>
               <span class="interview__topic-icon">
                 <img :src="img(topic.icon)" alt="" width="64" height="64" loading="lazy" />
-                <span class="iv-topic-rays" aria-hidden="true"><i></i><i></i><i></i></span>
               </span>
               <span class="interview__topic-text">
                 <!-- 項目名の \n は「幅が足りないときだけ改行する位置」 -->
                 <span class="interview__topic-title"><span class="interview__topic-mark"><template v-for="(part, i) in topic.title.split('\n')" :key="i"><wbr v-if="i > 0" />{{ part }}</template></span></span>
+                <!-- タイトル下の細いライン（左 → 右へ伸びる・繰り返し）＋ 右端の小さなドット -->
+                <span class="interview__topic-line" aria-hidden="true"><span class="interview__topic-bar"></span><span class="interview__topic-dots"></span></span>
                 <span v-if="topic.description" class="interview__topic-desc pre-line">{{ topic.description }}</span>
               </span>
             </div>
@@ -675,11 +683,12 @@ const DOTS = 15
 .interview__topics-panel {
   padding: clamp(20px, 2vw, 28px) clamp(18px, 1.8vw, 26px) clamp(20px, 2vw, 26px);
   background: rgba(255, 255, 255, 0.93);
-  border: 1px solid rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(235, 225, 245, 0.7);
   border-radius: 32px;
   box-shadow:
     0 24px 55px rgba(39, 58, 92, 0.1),
     0 8px 24px rgba(39, 58, 92, 0.06),
+    0 0 60px rgba(255, 214, 232, 0.35),
     inset 0 1px 0 rgba(255, 255, 255, 0.9);
   animation: iv-panel-float 6s ease-in-out infinite;
 }
@@ -702,10 +711,11 @@ const DOTS = 15
 .interview__topics-title {
   padding: 8px 26px;
   border-radius: 999px;
-  background: linear-gradient(135deg, rgba(255, 225, 235, 0.95), rgba(255, 235, 240, 0.9));
+  background: linear-gradient(120deg, rgba(255, 222, 234, 0.96), rgba(240, 228, 255, 0.94));
   box-shadow:
     0 10px 24px rgba(255, 150, 175, 0.15),
-    0 4px 10px rgba(35, 55, 95, 0.06);
+    0 4px 10px rgba(35, 55, 95, 0.06),
+    0 0 18px rgba(232, 214, 255, 0.5);
   animation: iv-title-float 4.5s ease-in-out infinite;
   color: var(--color-navy);
   font-size: var(--fs-md);
@@ -736,6 +746,10 @@ const DOTS = 15
 .iv-title-rays > span:nth-child(3) { top: 22px; rotate: -32deg; }
 .iv-title-rays--r > span:nth-child(1) { rotate: -32deg; }
 .iv-title-rays--r > span:nth-child(3) { rotate: 32deg; }
+/* 左右の小さな線は3色（ピンク・イエロー・ブルー） */
+.iv-title-rays > span:nth-child(1) { background: #ff9ab3; }
+.iv-title-rays > span:nth-child(2) { background: #f9cf4f; }
+.iv-title-rays > span:nth-child(3) { background: #8cbcf0; }
 
 /* ---------- 4枚のカード ---------- */
 .interview__topics {
@@ -745,21 +759,25 @@ const DOTS = 15
 }
 /* カードごとの色（lpContent.js の accent：green / pink / blue / yellow） */
 .interview__topic.accent-green {
+  --t-line: #5fcf9a;
   --t-bg: linear-gradient(135deg, rgba(242, 255, 247, 0.96), rgba(249, 255, 250, 0.92));
   --t-mark: rgba(190, 236, 170, 0.7);
   --t-ray: #8fd19e;
 }
 .interview__topic.accent-pink {
+  --t-line: #f39ab2;
   --t-bg: linear-gradient(135deg, rgba(255, 245, 248, 0.96), rgba(255, 250, 250, 0.92));
   --t-mark: rgba(255, 200, 218, 0.7);
   --t-ray: #f6a3b8;
 }
 .interview__topic.accent-blue {
+  --t-line: #7cb8f2;
   --t-bg: linear-gradient(135deg, rgba(241, 249, 255, 0.96), rgba(248, 252, 255, 0.92));
   --t-mark: rgba(190, 220, 250, 0.75);
   --t-ray: #8cbcf0;
 }
 .interview__topic.accent-yellow {
+  --t-line: #f2c447;
   --t-bg: linear-gradient(135deg, rgba(255, 252, 235, 0.96), rgba(255, 250, 242, 0.92));
   --t-mark: rgba(255, 225, 120, 0.65);
   --t-ray: #f6c94a;
@@ -774,15 +792,69 @@ const DOTS = 15
   gap: clamp(12px, 1.2vw, 16px);
   width: 100%;
   padding: clamp(16px, 1.6vw, 22px) clamp(14px, 1.4vw, 20px);
+  isolation: isolate;
   background: var(--t-bg);
-  border: 1px solid rgba(255, 255, 255, 0.8);
+  border: 1px solid color-mix(in srgb, var(--t-line) 28%, rgba(255, 255, 255, 0.8));
   border-radius: 22px;
   box-shadow:
-    0 14px 35px rgba(30, 55, 90, 0.07),
-    0 4px 12px rgba(30, 55, 90, 0.04);
+    0 16px 35px rgba(30, 55, 90, 0.07),
+    0 5px 14px rgba(30, 55, 90, 0.05);
   transition:
-    transform 0.35s ease,
-    box-shadow 0.35s ease;
+    transform 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.5s ease,
+    border-color 0.5s ease;
+}
+/* カード端の淡い装飾（角丸の中だけ・文字より後ろ・ごくゆっくり動く） */
+.iv-topic-deco {
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  overflow: hidden;
+  border-radius: inherit;
+  pointer-events: none;
+  transition: opacity 0.5s ease;
+}
+.iv-topic-deco > * {
+  position: absolute;
+}
+.iv-topic-deco__blob {
+  top: -34px;
+  right: -30px;
+  width: 120px;
+  height: 100px;
+  border-radius: 58% 42% 55% 45% / 48% 58% 42% 52%;
+  background: color-mix(in srgb, var(--t-line) 16%, transparent);
+  animation: iv-topic-ambient 12s ease-in-out calc(var(--t-i, 0) * -3s) infinite;
+}
+.iv-topic-deco__wave {
+  left: -15%;
+  right: -10%;
+  bottom: -52px;
+  height: 84px;
+  border-radius: 50% 50% 0 0 / 80% 100% 0 0;
+  background: linear-gradient(90deg, color-mix(in srgb, var(--t-line) 6%, transparent), color-mix(in srgb, var(--t-line) 20%, transparent));
+  rotate: -4deg;
+}
+.iv-topic-deco__circle {
+  left: 10px;
+  bottom: 14%;
+  width: 22px;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--t-line) 14%, transparent);
+  animation: iv-topic-ambient 10s ease-in-out calc(var(--t-i, 0) * -2s - 3s) infinite;
+}
+.iv-topic-deco__dot {
+  top: 18%;
+  right: 14%;
+  width: 10px;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--t-line) 28%, transparent);
+}
+@keyframes iv-topic-ambient {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(2px, -3px) scale(1.02); }
 }
 /* アイコン：淡い丸＋白いリングで少し存在感を出し、ゆっくり浮く（カードごとにずらす） */
 .interview__topic-icon {
@@ -794,10 +866,13 @@ const DOTS = 15
   height: clamp(60px, 5vw, 72px);
   border-radius: 50%;
   background: radial-gradient(circle at 35% 30%, #ffffff 0%, var(--accent-pale) 70%);
+  border: 1px solid color-mix(in srgb, var(--t-line) 25%, transparent);
   box-shadow:
     0 0 0 5px rgba(255, 255, 255, 0.75),
-    0 8px 18px rgba(30, 55, 90, 0.06);
+    0 8px 18px rgba(30, 55, 90, 0.06),
+    0 0 22px color-mix(in srgb, var(--t-line) 28%, transparent);
   animation: iv-topic-icon-float 6s ease-in-out calc(var(--t-i, 0) * -1.4s) infinite;
+  transition: translate 0.5s cubic-bezier(0.22, 1, 0.36, 1);
 }
 .interview__topic-icon img {
   width: 56%;
@@ -824,11 +899,52 @@ const DOTS = 15
 }
 /* タイトル下の手書き風マーカー（文字の下側に少し重なる・行ごとに丸く） */
 .interview__topic-mark {
-  padding: 0 2px;
-  background: linear-gradient(transparent 60%, var(--t-mark) 60%, var(--t-mark) 92%, transparent 92%);
-  border-radius: 6px;
-  -webkit-box-decoration-break: clone;
-  box-decoration-break: clone;
+  /* 以前のマーカー装飾はタイトル下のラインに置き換え */
+}
+/* タイトル下の細いライン：淡い下地の上を、色のラインが左 → 右へ伸びる（繰り返し）＋ 右端のドット */
+.interview__topic-line {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  max-width: 220px;
+  margin-top: 8px;
+}
+.interview__topic-bar {
+  position: relative;
+  flex: 1;
+  height: 2px;
+  border-radius: 2px;
+  background: color-mix(in srgb, var(--t-line) 18%, transparent);
+  overflow: hidden;
+}
+.interview__topic-bar::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(90deg, color-mix(in srgb, var(--t-line) 45%, transparent), var(--t-line));
+  transform: scaleX(0);
+  transform-origin: left center;
+  animation: iv-topic-line 3.4s ease-in-out calc(var(--t-i, 0) * 0.3s) infinite;
+}
+.interview__topic-dots {
+  flex: none;
+  width: 22px;
+  height: 6px;
+  background: radial-gradient(circle, var(--t-line) 2.2px, transparent 2.7px) 0 50% / 8px 6px repeat-x;
+  opacity: 0.45;
+  animation: iv-topic-dots 3.4s ease-in-out calc(var(--t-i, 0) * 0.3s) infinite;
+}
+@keyframes iv-topic-line {
+  0% { transform: scaleX(0); opacity: 1; }
+  45% { transform: scaleX(1); opacity: 1; }
+  75% { transform: scaleX(1); opacity: 1; }
+  92% { transform: scaleX(1); opacity: 0; }
+  100% { transform: scaleX(0); opacity: 0; }
+}
+@keyframes iv-topic-dots {
+  0%, 30%, 100% { opacity: 0.45; }
+  50%, 75% { opacity: 0.9; }
 }
 /* 項目の説明（通常の太さ・少し小さめ） */
 .interview__topic-desc {
@@ -839,34 +955,6 @@ const DOTS = 15
   font-weight: 400;
   line-height: 1.7;
 }
-/* アイコン右上の小さなアクセント線（ゆっくり濃淡・文字には重ならない位置） */
-.iv-topic-rays {
-  position: absolute;
-  top: -10px;
-  right: -10px;
-  width: 20px;
-  height: 18px;
-  pointer-events: none;
-}
-.iv-topic-rays i {
-  position: absolute;
-  bottom: 0;
-  width: 3px;
-  height: 10px;
-  border-radius: 2px;
-  background: var(--t-ray);
-  transform-origin: 50% 100%;
-  opacity: 0.4;
-  animation: iv-topic-ray 4.8s ease-in-out infinite;
-}
-.iv-topic-rays i:nth-child(1) { left: 2px; rotate: -30deg; }
-.iv-topic-rays i:nth-child(2) { left: 9px; height: 13px; animation-delay: 0.4s; }
-.iv-topic-rays i:nth-child(3) { left: 16px; rotate: 30deg; animation-delay: 0.8s; }
-@keyframes iv-topic-ray {
-  0%, 100% { opacity: 0.4; }
-  50% { opacity: 1; }
-}
-
 /* PC 2列（右側の列が狭い幅）：文章の幅を確保するため、アイコン・余白を少しコンパクトに */
 @media (min-width: 1025px) {
   .interview__topics-panel {
@@ -901,18 +989,27 @@ const DOTS = 15
 /* PC（マウス操作）：触れると少し浮く */
 @media (hover: hover) and (pointer: fine) {
   .interview__topic-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 14px 28px rgba(38, 55, 90, 0.1);
+    transform: translateY(-4px);
+    border-color: color-mix(in srgb, var(--t-line) 45%, rgba(255, 255, 255, 0.8));
+    box-shadow:
+      0 22px 44px rgba(30, 55, 90, 0.1),
+      0 8px 18px rgba(30, 55, 90, 0.06);
+  }
+  .interview__topic-card:hover .interview__topic-icon {
+    translate: 0 -2px;
+  }
+  .interview__topic-card:hover .iv-topic-deco__blob {
+    background: color-mix(in srgb, var(--t-line) 24%, transparent);
   }
 }
 
 /* スクロール表示：少し下から順番に（1回だけ・共通の v-reveal） */
 :global(.reveal-ready .interview .interview__topic.reveal) {
-  transform: translateY(24px) scale(0.98);
+  transform: translateY(20px) scale(0.98);
   transition:
     opacity 0.8s ease,
     transform 0.85s cubic-bezier(0.22, 1, 0.36, 1);
-  transition-delay: calc(50ms + var(--t-i, 0) * 70ms); /* 左上 → 右上 → 左下 → 右下 */
+  transition-delay: calc(50ms + var(--t-i, 0) * 90ms); /* 左上 → 右上 → 左下 → 右下 */
 }
 :global(.reveal-ready .interview.is-content-ready .interview__topic.reveal.is-revealed) {
   transform: none;
@@ -1165,10 +1262,21 @@ const DOTS = 15
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .iv-topic-deco__blob,
+  .iv-topic-deco__circle,
+  .interview__topic-dots {
+    animation: none;
+  }
+  .interview__topic-bar::after {
+    animation: none;
+    transform: scaleX(1); /* ラインは表示したまま */
+  }
+  .interview__topic-card:hover .interview__topic-icon {
+    translate: none;
+  }
   .interview__topics-panel,
   .interview__topics-title,
-  .interview__topic-icon,
-  .iv-topic-rays i {
+  .interview__topic-icon {
     animation: none;
   }
   .interview__topic-card {

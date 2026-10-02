@@ -89,12 +89,17 @@ const { stateClass } = useHeadingReveal(heading)
             <img :src="img(item.icon)" alt="" width="120" height="120" loading="lazy" />
           </div>
           <div class="timeline__card lp-card">
+            <!-- 右上のドット・右下の淡い弧（文字より後ろ） -->
+            <span class="timeline__deco" aria-hidden="true"><span class="timeline__deco-dots"></span><span class="timeline__deco-arc"></span></span>
             <div class="timeline__meta">
               <span class="timeline__step">{{ item.step }}</span>
               <span v-if="item.period" class="timeline__period">{{ item.period }}</span>
             </div>
-            <h3 class="timeline__title">{{ item.title }}</h3>
-            <p class="timeline__text">{{ item.description }}</p>
+            <!-- タイトル：下のドットラインは表示時に左 → 右へ伸びる（1回だけ） -->
+            <!-- タイトルの \n は「幅が足りないときだけ改行する位置」 -->
+            <h3 class="timeline__title"><template v-for="(part, i) in item.title.split('\n')" :key="i"><wbr v-if="i > 0" />{{ part }}</template></h3>
+            <!-- 説明文の \n：PC / Tablet は改行、SP は改行せず自然に折り返す -->
+            <p class="timeline__text"><template v-for="(part, i) in item.description.split('\n')" :key="i"><br v-if="i > 0" class="timeline__br" />{{ part }}</template></p>
           </div>
         </li>
       </ol>
@@ -355,6 +360,9 @@ const { stateClass } = useHeadingReveal(heading)
   opacity: 0.45;
 }
 .timeline__item {
+  /* STEP ごとのテーマ色（左の線・矢印・アイコンの輪・ドットライン・カードの淡い色） */
+  --step-color: #f5c84c;
+  --step-tint: rgba(255, 248, 220, 0.72);
   /* 浮遊の強さ（SPで弱める） */
   --card-float: 5px;
   --icon-float: 2.5px;
@@ -371,8 +379,10 @@ const { stateClass } = useHeadingReveal(heading)
   height: 88px;
   padding: 6px;
   border-radius: 50%;
-  background: var(--color-white);
-  border: 3px solid var(--accent);
+  background: radial-gradient(circle at 50% 45%, #ffffff 0%, var(--accent-pale) 72%);
+  border: 3px solid var(--step-color);
+  outline: 2px solid color-mix(in srgb, var(--step-color) 28%, transparent); /* 二重の輪 */
+  outline-offset: 4px;
   box-shadow: 0 6px 16px rgba(31, 55, 95, 0.07);
   /* カードより少し遅れて、小さく浮いて脈打つ */
   animation: step-icon-pulse var(--icon-dur, 4.8s) ease-in-out var(--icon-delay, 0.5s) infinite;
@@ -382,13 +392,16 @@ const { stateClass } = useHeadingReveal(heading)
   height: 100%;
 }
 .timeline__card {
-  padding: 22px 28px;
-  border-left: 6px solid var(--accent);
+  padding: 24px 30px 26px;
+  border: 1px solid color-mix(in srgb, var(--step-color) 22%, transparent);
+  border-left: 5px solid var(--step-color);
+  border-radius: 26px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.98) 30%, var(--step-tint));
   /* 常時の影（静的）：ネイビー系＋各カードのアクセント色をごく薄く */
   box-shadow:
-    0 10px 28px rgba(32, 56, 100, 0.07),
-    0 3px 10px rgba(32, 56, 100, 0.04),
-    0 14px 30px -10px color-mix(in srgb, var(--accent) 45%, transparent);
+    0 18px 40px rgba(32, 52, 90, 0.08),
+    0 6px 16px rgba(32, 52, 90, 0.06),
+    0 14px 30px -12px color-mix(in srgb, var(--step-color) 40%, transparent);
   /* 常時の浮遊は個別プロパティ translate、hover は transform（競合しない） */
   animation: step-card-float var(--card-dur, 5.4s) ease-in-out var(--card-delay, 0s) infinite;
   transition: transform 0.35s cubic-bezier(0.22, 0.61, 0.36, 1), box-shadow 0.35s ease;
@@ -404,6 +417,9 @@ const { stateClass } = useHeadingReveal(heading)
   pointer-events: none;
   animation: step-card-shadow var(--card-dur, 5.4s) ease-in-out var(--card-delay, 0s) infinite;
 }
+.timeline__item.accent-pink { --step-color: #ff9aaf; --step-tint: rgba(255, 234, 240, 0.72); }
+.timeline__item.accent-blue { --step-color: #78b9f7; --step-tint: rgba(230, 242, 255, 0.75); }
+.timeline__item.accent-green { --step-color: #78d69a; --step-tint: rgba(228, 248, 236, 0.75); }
 /* 上から下へ動きが伝わるように、周期と開始を少しずつずらす */
 /* アイコンはカードと同じ周期で、常に 0.8 秒遅れて動く */
 .timeline__item:nth-child(1) { --card-dur: 5.2s; --card-delay: 0s;   --icon-dur: 5.2s; --icon-delay: 0.8s; }
@@ -414,11 +430,11 @@ const { stateClass } = useHeadingReveal(heading)
 /* PC（マウス操作）の hover：さらに少し持ち上がり、影が強くなる */
 @media (hover: hover) and (pointer: fine) {
   .timeline__card:hover {
-    transform: translateY(-3px) scale(1.005);
+    transform: translateY(-5px);
     box-shadow:
-      0 16px 36px rgba(32, 56, 100, 0.1),
-      0 5px 14px rgba(32, 56, 100, 0.05),
-      0 18px 34px -10px color-mix(in srgb, var(--accent) 55%, transparent);
+      0 24px 48px rgba(32, 52, 90, 0.1),
+      0 8px 20px rgba(32, 52, 90, 0.07),
+      0 18px 34px -12px color-mix(in srgb, var(--step-color) 50%, transparent);
   }
 }
 
@@ -440,8 +456,8 @@ const { stateClass } = useHeadingReveal(heading)
   left: -18px;
   top: 50%;
   translate: 0 -50%;
-  border: 10px solid transparent;
-  border-right-color: var(--accent);
+  border: 9px solid transparent;
+  border-right-color: var(--step-color);
   border-left: 0;
 }
 .timeline__meta {
@@ -451,14 +467,17 @@ const { stateClass } = useHeadingReveal(heading)
   gap: 10px;
 }
 .timeline__step {
-  color: var(--color-coral);
+  position: relative;
+  color: #f36f61;
   font-family: var(--font-number);
-  font-weight: 900;
+  font-weight: 700;
+  text-transform: uppercase;
   font-size: var(--fs-md);
   letter-spacing: 0.08em;
 }
 .timeline__period {
-  padding: 2px 12px;
+  position: relative;
+  padding: 3px 14px;
   border-radius: var(--radius-pill);
   background: var(--accent-pale);
   color: var(--color-navy);
@@ -466,14 +485,101 @@ const { stateClass } = useHeadingReveal(heading)
   font-weight: 700;
 }
 .timeline__title {
-  margin-top: 4px;
+  position: relative;
+  display: inline-block;
+  margin-top: 6px;
+  padding-bottom: 12px;
+  color: var(--color-navy);
   font-size: var(--fs-lg);
   font-weight: 900;
+  word-break: keep-all; /* \n（<wbr>）の位置でだけ改行する */
+  overflow-wrap: anywhere;
+}
+/* タイトル下の丸いドットのライン（STEP の色） */
+.timeline__title::after {
+  content: '';
+  position: absolute;
+  left: 2px;
+  right: 0;
+  bottom: 0;
+  height: 5px;
+  background: radial-gradient(circle, var(--step-color) 2.2px, transparent 2.6px) 0 50% / 10px 5px repeat-x;
+  /* 繰り返し：左 → 右へ表示 → 少し止まる → ふわっと消える（ドットの形はそのまま、見える範囲だけを変える） */
+  clip-path: inset(0 100% 0 0);
+  animation: step-dot-loop 3.6s ease-in-out var(--dot-delay, 0s) infinite;
+}
+.timeline__item:nth-child(2) .timeline__title::after { --dot-delay: 0.25s; }
+.timeline__item:nth-child(3) .timeline__title::after { --dot-delay: 0.5s; }
+.timeline__item:nth-child(4) .timeline__title::after { --dot-delay: 0.75s; }
+@keyframes step-dot-loop {
+  0% { clip-path: inset(0 100% 0 0); opacity: 0; }
+  8% { opacity: 1; }
+  38% { clip-path: inset(0 0 0 0); opacity: 1; }
+  72% { clip-path: inset(0 0 0 0); opacity: 1; }
+  88% { clip-path: inset(0 0 0 0); opacity: 0; }
+  100% { clip-path: inset(0 100% 0 0); opacity: 0; }
 }
 .timeline__text {
-  margin-top: 8px;
+  position: relative;
+  margin-top: 10px;
+  text-wrap: pretty; /* 最後の行が1〜2文字だけにならないように */
   font-size: var(--fs-sm);
   line-height: 1.85;
+}
+
+/* カード内の装飾：右上のドット・右下の淡い弧（カードの角丸の中だけ） */
+.timeline__deco {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  overflow: hidden;
+  pointer-events: none;
+}
+.timeline__deco-dots {
+  position: absolute;
+  top: 22px;
+  right: 26px;
+  width: 92px;
+  height: 66px;
+  background: radial-gradient(circle, var(--step-color) 2.2px, transparent 2.8px) 0 0 / 23px 22px;
+  opacity: 0.22;
+}
+.timeline__deco-arc {
+  position: absolute;
+  right: -60px;
+  bottom: -110px;
+  width: 260px;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(circle, transparent 52%, color-mix(in srgb, var(--step-color) 22%, transparent) 53%, color-mix(in srgb, var(--step-color) 12%, transparent) 70%, transparent 71%);
+  opacity: 0.5;
+}
+
+/* ================= スクロール表示（1回だけ）：カード → タイトル（+150ms）。ドットラインは常に繰り返し ================= */
+.timeline__item {
+  --step-base: calc(var(--reveal-base, 0ms) * var(--reveal-base-scale) + var(--reveal-i, 0) * var(--reveal-step) + var(--hr-seq, 0ms));
+}
+:global(.reveal-ready .growth .timeline__item.reveal) {
+  transform: translate3d(0, 24px, 0) scale(0.985);
+  transition:
+    opacity 0.8s ease,
+    transform 0.85s cubic-bezier(0.22, 1, 0.36, 1);
+  transition-delay: var(--step-base);
+}
+:global(.reveal-ready .growth.is-content-ready .timeline__item.reveal.is-revealed) {
+  transform: none;
+}
+:global(.reveal-ready .growth .timeline__item .timeline__title) {
+  opacity: 0;
+  translate: 0 8px;
+  transition:
+    opacity 0.6s ease,
+    translate 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+  transition-delay: calc(var(--step-base) + 150ms);
+}
+:global(.reveal-ready .growth.is-content-ready .timeline__item.is-revealed .timeline__title) {
+  opacity: 1;
+  translate: 0 0;
 }
 
 .growth__blob-1 {
@@ -548,7 +654,23 @@ const { stateClass } = useHeadingReveal(heading)
     padding: 4px;
   }
   .timeline__card {
-    padding: 18px 18px;
+    padding: 18px 18px 20px;
+    border-radius: 22px;
+  }
+  .timeline__br {
+    display: none;
+  }
+  .timeline__title {
+    font-size: 1.125rem;
+  }
+  .timeline__deco-dots {
+    top: 14px;
+    right: 14px;
+    width: 46px;
+    height: 44px;
+  }
+  .timeline__marker {
+    outline-offset: 3px;
   }
   .timeline__card::before {
     top: 32px;
@@ -574,6 +696,18 @@ const { stateClass } = useHeadingReveal(heading)
   }
   .timeline__card:hover {
     transform: none;
+  }
+  :global(.reveal-ready .growth .timeline__item.reveal) {
+    transform: none;
+  }
+  :global(.reveal-ready .growth .timeline__item .timeline__title) {
+    opacity: 1;
+    translate: none;
+  }
+  .timeline__title::after {
+    animation: none;
+    clip-path: none;
+    opacity: 1;
   }
   .gn-ray,
   .gn-glint {

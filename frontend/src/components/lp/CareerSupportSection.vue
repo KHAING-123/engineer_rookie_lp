@@ -39,10 +39,19 @@ const { stateClass } = useHeadingReveal(heading)
           >
             <div class="support__float" :class="`support__float--${index % 4}`">
               <div class="support-card lp-card" :class="`accent-${item.accent || 'yellow'}`">
+                <!-- 淡い装飾（大小の丸・角の Blob・下の波。文字より後ろ） -->
+                <span class="support-card__deco" aria-hidden="true">
+                  <span class="support-card__blob"></span>
+                  <span class="support-card__circle"></span>
+                  <span class="support-card__circle support-card__circle--sm"></span>
+                  <span class="support-card__wave"></span>
+                </span>
                 <div class="support-card__icon">
                   <img :src="img(item.icon)" alt="" width="120" height="120" loading="lazy" />
                 </div>
                 <h3 class="support-card__title">{{ item.title }}</h3>
+                <!-- タイトル下の短いドットライン（明るいドットが左 → 右へ流れ続ける） -->
+                <span class="support-card__dots" aria-hidden="true" :style="{ '--dot-delay': `${index * 0.35}s` }"></span>
                 <p class="support-card__text">{{ item.description }}</p>
               </div>
             </div>
@@ -70,6 +79,18 @@ const { stateClass } = useHeadingReveal(heading)
                 <path class="sd-line sd-line--blue" pathLength="1" d="M226 18 C 244 10, 262 12, 282 20" />
               </svg>
             </div>
+
+            <!-- 画像の後ろの Premium 背景（淡い Blob・光・丸・ドット）：画像とは別の速さでごくゆっくり動く -->
+            <span class="support-premium-bg" aria-hidden="true">
+              <span class="spb-blob spb-blob--1"></span>
+              <span class="spb-blob spb-blob--2"></span>
+              <span class="spb-glow"></span>
+              <span class="spb-circle spb-circle--1"></span>
+              <span class="spb-circle spb-circle--2"></span>
+              <span class="spb-dots"></span>
+            </span>
+            <!-- 画像の下の柔らかい影（画像の浮遊と同じ周期で、浮くと広がって薄くなる） -->
+            <span class="support-ambient-shadow" aria-hidden="true"></span>
 
             <div class="support__illustration-float">
               <IllustrationFrame class="support__frame" :src="section.image" :alt="section.imageAlt" ratio="3 / 2" />
@@ -100,6 +121,7 @@ const { stateClass } = useHeadingReveal(heading)
 .support__list {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
+  grid-auto-rows: 1fr; /* 4枚の高さをそろえる */
   gap: 20px;
 }
 .support {
@@ -107,7 +129,7 @@ const { stateClass } = useHeadingReveal(heading)
   --card-float-y: 7px;
   --card-float-x: 2px;
   --card-float-r: 0.35deg;
-  --img-float-y: 8px;
+  --img-float-y: 7px;
   --img-float-x: 4px;
   --img-float-r: 0.4deg;
 }
@@ -130,18 +152,96 @@ const { stateClass } = useHeadingReveal(heading)
 .support__float--3 { animation-name: support-float-a; animation-duration: 9s; animation-delay: -6.2s; animation-direction: reverse; }
 
 .support-card {
-  padding: 26px 24px;
-  background: var(--accent-pale);
-  /* 背景からふわっと浮いて見える柔らかい影（静的） */
-  box-shadow: 0 14px 32px rgba(31, 54, 105, 0.07), 0 5px 12px rgba(31, 54, 105, 0.04);
-  border: 2px solid var(--color-white);
-  transition: transform 0.35s cubic-bezier(0.22, 0.61, 0.36, 1), box-shadow 0.35s ease;
+  --sc: #ff9aaf; /* カードのアクセント色（枠・アイコン・ドット・装飾） */
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-rows: auto auto 1fr;
+  column-gap: 18px;
+  align-items: center;
+  padding: 26px 26px 30px;
+  background: linear-gradient(160deg, #ffffff 45%, color-mix(in srgb, var(--sc) 7%, #fffdf8));
+  border: 1.5px solid color-mix(in srgb, var(--sc) 40%, transparent);
+  border-radius: 26px;
+  /* 背景からふわっと浮いて見える柔らかい影（アクセント色をごく薄く） */
+  box-shadow:
+    0 16px 35px rgba(30, 55, 90, 0.08),
+    0 5px 15px rgba(30, 55, 90, 0.05),
+    0 16px 30px -16px color-mix(in srgb, var(--sc) 50%, transparent);
+  transition:
+    transform 0.35s cubic-bezier(0.22, 0.61, 0.36, 1),
+    box-shadow 0.35s ease,
+    border-color 0.35s ease;
 }
+.support-card.accent-blue { --sc: #6cc3f0; }
+.support-card.accent-yellow { --sc: #f5c84c; }
+.support-card.accent-green { --sc: #6fd39b; }
 @media (hover: hover) and (pointer: fine) {
   .support-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 20px 40px rgba(31, 54, 105, 0.1), 0 7px 16px rgba(31, 54, 105, 0.05);
+    transform: translateY(-5px);
+    border-color: color-mix(in srgb, var(--sc) 60%, transparent);
+    box-shadow:
+      0 22px 44px rgba(30, 55, 90, 0.1),
+      0 7px 18px rgba(30, 55, 90, 0.06),
+      0 18px 34px -14px color-mix(in srgb, var(--sc) 65%, transparent);
   }
+  /* アイコンのごく小さな動き（hover 時のみ） */
+  .support-card:hover .support-card__icon {
+    translate: 0 -2px;
+    scale: 1.03;
+    box-shadow:
+      0 0 0 5px rgba(255, 255, 255, 0.95),
+      0 0 0 6.5px color-mix(in srgb, var(--sc) 30%, transparent),
+      0 10px 24px color-mix(in srgb, var(--sc) 40%, transparent);
+  }
+}
+/* 淡い装飾（カードの角丸の中だけ・文字より後ろ） */
+.support-card__deco {
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  overflow: hidden;
+  border-radius: inherit;
+  pointer-events: none;
+}
+.support-card__deco > * {
+  position: absolute;
+}
+.support-card__blob {
+  top: -40px;
+  right: -40px;
+  width: 140px;
+  height: 120px;
+  border-radius: 58% 42% 55% 45% / 48% 58% 42% 52%;
+  background: color-mix(in srgb, var(--sc) 20%, transparent);
+}
+.support-card__circle {
+  top: 22px;
+  right: 22%;
+  width: 26px;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--sc) 22%, transparent);
+}
+.support-card__circle--sm {
+  top: auto;
+  right: auto;
+  left: auto;
+  right: 10%;
+  bottom: 18%;
+  width: 34px;
+  background: color-mix(in srgb, var(--sc) 12%, transparent);
+}
+/* 下の柔らかい波 */
+.support-card__wave {
+  left: -10%;
+  right: -10%;
+  bottom: -46px;
+  height: 90px;
+  border-radius: 50% 50% 0 0 / 70% 90% 0 0;
+  background: linear-gradient(90deg, color-mix(in srgb, var(--sc) 10%, transparent), color-mix(in srgb, var(--sc) 24%, transparent));
+  rotate: -3deg;
 }
 
 @keyframes support-float-a {
@@ -160,22 +260,68 @@ const { stateClass } = useHeadingReveal(heading)
   60% { transform: translate3d(calc(var(--card-float-x) * -1), calc(var(--card-float-y) * -1), 0) rotate(calc(var(--card-float-r) * -1)); }
 }
 .support-card__icon {
-  width: 64px;
-  height: 64px;
-  margin-bottom: 12px;
+  grid-row: 1 / span 2;
+  width: 76px;
+  height: 76px;
+  padding: 10px;
+  border-radius: 50%;
+  /* 淡いカラーの丸 ＋ 白いリング ＋ 薄い輪 ＋ やわらかい光 */
+  background: radial-gradient(circle at 50% 45%, #ffffff 0%, color-mix(in srgb, var(--sc) 22%, #ffffff) 75%);
+  box-shadow:
+    0 0 0 5px rgba(255, 255, 255, 0.95),
+    0 0 0 6.5px color-mix(in srgb, var(--sc) 25%, transparent),
+    0 8px 20px color-mix(in srgb, var(--sc) 28%, transparent);
+  transition:
+    translate 0.35s ease,
+    scale 0.35s ease,
+    box-shadow 0.35s ease;
 }
 .support-card__icon img {
   width: 100%;
   height: 100%;
 }
 .support-card__title {
+  align-self: end;
+  color: var(--color-navy);
   font-size: var(--fs-lg);
-  font-weight: 900;
+  font-weight: 700;
+  line-height: 1.4;
+}
+/* タイトル下の短いドットライン：淡いドットの上を、明るいドット（光）が左 → 右へ流れ続ける */
+.support-card__dots {
+  position: relative;
+  align-self: start;
+  display: block;
+  width: min(150px, 100%);
+  height: 6px;
+  margin-top: 8px;
+  background: radial-gradient(circle, color-mix(in srgb, var(--sc) 45%, transparent) 2.2px, transparent 2.6px) 0 50% / 11px 6px repeat-x;
+}
+.support-card__dots::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle, var(--sc) 2.4px, transparent 2.8px) 0 50% / 11px 6px repeat-x;
+  filter: drop-shadow(0 0 2px color-mix(in srgb, var(--sc) 60%, transparent));
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 40%, #000 60%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 40%, #000 60%, transparent);
+  -webkit-mask-size: 44px 100%;
+  mask-size: 44px 100%;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  animation: support-dot-flow 2.6s linear var(--dot-delay, 0s) infinite;
+}
+@keyframes support-dot-flow {
+  0% { -webkit-mask-position: -44px 0; mask-position: -44px 0; }
+  100% { -webkit-mask-position: 150px 0; mask-position: 150px 0; }
 }
 .support-card__text {
-  margin-top: 8px;
+  grid-column: 1 / -1;
+  align-self: start;
+  margin-top: 16px;
   font-size: var(--fs-sm);
   line-height: 1.85;
+  text-wrap: pretty; /* 最後の行が1〜2文字だけにならないように */
 }
 .support__visual {
   position: relative;
@@ -287,9 +433,121 @@ const { stateClass } = useHeadingReveal(heading)
   position: relative;
   z-index: 2;
   will-change: transform;
-  /* 背景透過PNG向けの柔らかい影（白背景入りPNGの場合は四角い影になるため、素材は背景透過を推奨） */
-  filter: drop-shadow(0 16px 24px rgba(31, 54, 105, 0.08));
-  animation: support-img-float 12s ease-in-out -3s infinite;
+  /* 浮遊：ゆっくり（6.5s）。hover の持ち上げは translate（transform の浮遊と別プロパティ） */
+  /* 少し上に浮いた配置（top で調整：浮遊の transform とは別） */
+  top: var(--img-lift, -14px);
+  animation: support-img-float 5.5s ease-in-out -3s infinite;
+  transition: translate 0.4s ease;
+}
+/* 画像の下の柔らかい影（浮遊と同じ周期：上がると広がって薄くなる） */
+.support-ambient-shadow {
+  position: absolute;
+  z-index: 1;
+  left: 14%;
+  right: 14%;
+  bottom: -14%;
+  height: 26px;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(30, 55, 90, 0.16), transparent);
+  filter: blur(4px);
+  pointer-events: none;
+  animation: support-ambient 5.5s ease-in-out -3s infinite;
+}
+@keyframes support-ambient {
+  0%, 100% { transform: scaleX(1); opacity: 0.9; }
+  35% { transform: scaleX(1.08); opacity: 0.65; }
+  70% { transform: scaleX(1.03); opacity: 0.8; }
+}
+/* 画像の後ろの Premium 背景（奥のレイヤー） */
+.support-premium-bg {
+  position: absolute;
+  z-index: 0;
+  inset: -18% -14%;
+  pointer-events: none;
+}
+.support-premium-bg > * {
+  position: absolute;
+}
+.spb-blob {
+  border-radius: 58% 42% 55% 45% / 48% 58% 42% 52%;
+  filter: blur(14px);
+  animation: spb-drift 14s ease-in-out infinite;
+}
+.spb-blob--1 {
+  left: 0;
+  top: 4%;
+  width: 62%;
+  height: 70%;
+  background: linear-gradient(135deg, rgba(255, 214, 228, 0.55), rgba(255, 240, 200, 0.45));
+}
+.spb-blob--2 {
+  right: 0;
+  bottom: 2%;
+  width: 64%;
+  height: 66%;
+  background: linear-gradient(135deg, rgba(200, 230, 255, 0.55), rgba(205, 242, 225, 0.45));
+  animation-duration: 17s;
+  animation-delay: -6s;
+}
+.spb-glow {
+  left: 20%;
+  top: 14%;
+  width: 60%;
+  height: 60%;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(255, 255, 255, 0.85), transparent);
+  animation: spb-glow 9s ease-in-out infinite;
+  transition: opacity 0.4s ease;
+}
+.spb-circle {
+  border-radius: 50%;
+  animation: spb-drift 11s ease-in-out infinite;
+}
+.spb-circle--1 {
+  right: 6%;
+  top: 10%;
+  width: 34px;
+  aspect-ratio: 1;
+  background: rgba(255, 210, 225, 0.6);
+}
+.spb-circle--2 {
+  left: 4%;
+  bottom: 18%;
+  width: 22px;
+  aspect-ratio: 1;
+  background: rgba(190, 225, 255, 0.65);
+  animation-duration: 13s;
+  animation-delay: -5s;
+}
+.spb-dots {
+  left: 6%;
+  top: 8%;
+  width: 54px;
+  height: 36px;
+  background: radial-gradient(circle, rgba(140, 190, 240, 0.7) 1.6px, transparent 2.2px) 0 0 / 11px 11px;
+  opacity: 0.6;
+}
+@keyframes spb-drift {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+  50% { transform: translate3d(5px, -6px, 0) scale(1.03); }
+}
+@keyframes spb-glow {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 0.95; }
+}
+/* PC hover：少しだけ持ち上がり、影と光が少し強くなる */
+@media (hover: hover) and (pointer: fine) {
+  .support__stage:hover .support__illustration-float {
+    translate: 0 -3px;
+  }
+  .support__stage:hover .support__frame {
+    filter:
+      drop-shadow(0 26px 32px rgba(31, 55, 80, 0.13))
+      drop-shadow(0 10px 16px rgba(31, 55, 80, 0.08));
+  }
+  .support__stage:hover .spb-glow {
+    opacity: 1;
+  }
 }
 @keyframes support-img-float {
   0%, 100% { transform: translate3d(0, 0, 0) rotate(calc(var(--img-float-r) * -0.75)); }
@@ -301,6 +559,11 @@ const { stateClass } = useHeadingReveal(heading)
   z-index: 1;
   max-width: 440px;
   margin-inline: auto;
+  /* 画像そのもの（背景透過）の形に沿った、柔らかく浮いて見える影 */
+  filter:
+    drop-shadow(0 22px 28px rgba(31, 55, 80, 0.1))
+    drop-shadow(0 8px 14px rgba(31, 55, 80, 0.06));
+  transition: filter 0.4s ease;
 }
 .support__visual-blob {
   inset: 8% 4%;
@@ -337,7 +600,8 @@ const { stateClass } = useHeadingReveal(heading)
     --card-float-y: 4px;
     --card-float-x: 1px;
     --card-float-r: 0.15deg;
-    --img-float-y: 5px;
+    --img-float-y: 4px;
+    --img-lift: -6px;
     --img-float-x: 2px;
     --img-float-r: 0.2deg;
   }
@@ -364,25 +628,31 @@ const { stateClass } = useHeadingReveal(heading)
   .sd-glow {
     inset: 10% 0 0;
   }
+  /* 画像まわり：影を弱め、装飾を減らす（画面からはみ出さない） */
+  .support-premium-bg {
+    inset: -10% -4%;
+  }
+  .spb-circle--2,
+  .spb-dots {
+    display: none;
+  }
 }
 @media (max-width: 600px) {
   .support__list {
     grid-template-columns: 1fr;
   }
   .support-card {
-    display: grid;
-    grid-template-columns: 56px 1fr;
     column-gap: 16px;
-    padding: 20px;
+    padding: 20px 20px 24px;
+    border-radius: 22px;
   }
   .support-card__icon {
-    grid-row: span 2;
-    width: 56px;
-    height: 56px;
-    margin: 0;
+    width: 62px;
+    height: 62px;
+    padding: 8px;
   }
   .support-card__text {
-    margin-top: 4px;
+    margin-top: 12px;
   }
 }
 
@@ -406,11 +676,33 @@ const { stateClass } = useHeadingReveal(heading)
     transform: none !important;
     will-change: auto;
   }
-  .support-card {
+  .support-ambient-shadow,
+  .spb-blob,
+  .spb-glow,
+  .spb-circle {
+    animation: none !important;
+  }
+  .support__illustration-float,
+  .support__frame {
+    transition: none;
+  }
+  .support__stage:hover .support__illustration-float {
+    translate: none;
+  }
+  .support-card,
+  .support-card__icon {
     transition: none;
   }
   .support-card:hover {
     transform: none;
+  }
+  .support-card:hover .support-card__icon {
+    translate: none;
+    scale: 1;
+  }
+  .support-card__dots::after {
+    animation: none;
+    display: none; /* ドットラインは淡いドットのまま表示 */
   }
 }
 </style>

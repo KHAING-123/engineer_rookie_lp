@@ -311,6 +311,9 @@ const { stateClass } = useHeadingReveal(heading)
 }
 .careers__list > li {
   display: flex;
+  /* カードのスクロール表示：下 20px から、80ms ずつ順番に（共通の v-reveal） */
+  --reveal-y: 20px;
+  --reveal-step: 80ms;
 }
 .careers__list > li > * {
   flex: 1;

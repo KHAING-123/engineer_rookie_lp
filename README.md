@@ -51,7 +51,8 @@ frontend/src/data/lpContent.js
 | 04 キャリアサポート | `supportItems` |
 | 05 キャリアの広がり（5枚のカード） | `careers` |
 | 05 メモ「未来の選択肢、ここから広がる。」 | `careersSection.note` |
-| 06 面接で話す内容・ポイント | `interview.topics` / `interview.points` |
+| 06 「面接でお話しすること」4項目（文章・アイコン・丸の色） | `interview.topics` |
+| 06 下の3つのポイント（タイトル・説明・アイコン・色） | `interview.points` |
 | 06 イラスト横のメモ「リラックスしてお話ください。」 | `interview.note` |
 | 07 選考の流れ（STEP名・日数・メモ・丸の色） | `selectionFlow` |
 | 最後のCTA（画像の説明文） | `finalCta` |
@@ -99,6 +100,8 @@ note: { highlight: '未来', line1: 'の選択肢、', line2: 'ここから広�
 | `members` / `jobs` / `growthSteps` / `supportItems` / `careers` の `accent` | `'yellow'` / `'pink'` / `'green'` / `'blue'` |
 | `header.nav` の `accent`（ナビの下線） | `'coral'` / `'mint'` / `'yellow'` / `'pink'` / `'blue'` |
 | `selectionFlow` の `circle`（アイコンの後ろの丸） | `'blue'` / `'yellow'` / `'lavender'` / `'pink'` / `'green'` |
+| `interview.topics` の `accent`（アイコンの後ろの丸） | `'green'` / `'pink'` / `'blue'` / `'yellow'` |
+| `interview.points` の `accent`（カードの色） | `'yellow'` / `'blue'` / `'green'` |
 
 ---
 
@@ -148,6 +151,7 @@ image: 'members/member-01.png',   // → frontend/src/assets/images/members/memb
 | キャリアサポートの人物イラスト（04） | `support/` | `support-mentor-illustration.png` |
 | キャリアのアイコン（05） | `icons/career/` | `career-developer.png` など |
 | 面接の人物イラスト（06） | `interview/` | `interview-conversation-illustration.png` |
+| 面接でお話しすること・ポイントのアイコン（06） | `icons/interview/` | `interview-learning.svg` `point-clothes.svg` など |
 | 選考の流れのアイコン（07） | `icons/selection/` | `selection-document` など |
 | **Final CTA** | `cta/` | PC用 `final-cta-pc.png`／スマホ用 `final-cta-sp.png` |
 | ロゴ・装飾（葉っぱ・ドットなど） | `common/` | `preai-logo.svg` `deco-leaf.svg` など |
