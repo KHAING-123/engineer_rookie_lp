@@ -286,7 +286,7 @@ onBeforeUnmount(() => {
   display: block;
 }
 .site-header__logo-mark {
-  width: clamp(65px, 5.5vw, 84px); /* 従来 clamp(130px, 11vw, 168px) の 50% */
+  width: clamp(78px, 6.6vw, 100px); /* 以前 clamp(65px, 5.5vw, 84px) の約 1.2 倍 */
 }
 .site-header__end {
   justify-self: end;
@@ -995,7 +995,7 @@ onBeforeUnmount(() => {
 }
 @media (max-width: 600px) {
   .site-header__logo-mark {
-    width: 56px; /* 従来 112px の 50% */
+    width: 64px; /* 以前 56px の約 1.15 倍 */
   }
   .drawer {
     width: 100%;

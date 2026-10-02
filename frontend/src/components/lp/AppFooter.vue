@@ -46,7 +46,12 @@ const { footer, site } = lpContent
   padding-block: 40px;
 }
 .site-footer__logo-mark {
-  width: 75px; /* 従来 150px の 50% */
+  width: 84px; /* SP：以前 75px の約 1.12 倍 */
+}
+@media (min-width: 768px) {
+  .site-footer__logo-mark {
+    width: 90px; /* PC：以前 75px の 1.2 倍 */
+  }
 }
 /* ロゴは小さくしても、リンク・SNS の位置が変わらないよう従来のロゴ幅（150px）の枠を確保（ロゴは左端） */
 @media (min-width: 768px) {

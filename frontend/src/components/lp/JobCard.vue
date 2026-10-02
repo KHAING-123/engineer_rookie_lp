@@ -33,6 +33,9 @@ defineProps({
         <span class="our-work-card__curve"></span>
         <span class="our-work-card__dots"></span>
         <span class="our-work-card__dots our-work-card__dots--bottom"></span>
+        <span class="our-work-card__wave"></span>
+        <!-- 画像まわりの淡い光：左下 → 右上へごくゆっくり移動 -->
+        <span class="our-work-card__glow"></span>
       </span>
 
       <div class="our-work-card__image">
@@ -44,8 +47,11 @@ defineProps({
       </div>
 
       <div class="our-work-card__content">
+        <!-- タイトル上の短いライン（中を淡い光が左 → 右へ流れる） -->
+        <span class="our-work-card__accent" aria-hidden="true"></span>
         <h3 class="our-work-card__title">{{ job.title }}</h3>
-        <p class="our-work-card__description">{{ job.description }}</p>
+        <!-- 説明文の \n は「幅が足りないときだけ改行する位置」 -->
+        <p class="our-work-card__description"><template v-for="(part, i) in job.description.split('\n')" :key="i"><wbr v-if="i > 0" />{{ part }}</template></p>
         <ul class="our-work-card__tags" aria-label="使用するスキル">
           <li v-for="tag in job.tags" :key="tag" class="our-work-card__tag">{{ tag }}</li>
         </ul>
@@ -55,40 +61,47 @@ defineProps({
 </template>
 
 <style scoped>
-/* ================= テーマカラー（Yellow / Mint / Pink） ================= */
+/* ================= テーマカラー（Web：イエロー/オレンジ / モバイル：ブルー/シアン/ミント / データ・AI：ピンク/ラベンダー） ================= */
+/* 色の指定は lpContent.js の accent（yellow / green / pink）のまま */
 .our-work-card--yellow {
   --ow-bg:
-    radial-gradient(circle at 20% 15%, rgba(255, 218, 95, 0.18), transparent 35%),
-    linear-gradient(145deg, rgba(255, 255, 255, 0.98), rgba(255, 248, 220, 0.88));
-  --ow-deco: #ffc94d;     /* 装飾の色 */
-  --ow-tag-bg: #ffedb8;   /* タグの背景 */
-  --ow-border: rgba(255, 214, 120, 0.3);
+    radial-gradient(circle at 18% 12%, rgba(255, 210, 120, 0.22), transparent 40%),
+    linear-gradient(160deg, rgba(255, 249, 232, 0.98), rgba(255, 253, 248, 0.96) 55%, rgba(255, 240, 214, 0.9));
+  --ow-deco: #ffc56b;     /* 装飾の色 */
+  --ow-accent: #ff9a4d;   /* タイトル上のライン */
+  --ow-tag-bg: #ffe9c7;   /* タグの背景 */
+  --ow-border: rgba(255, 190, 120, 0.4);
+  --ow-glow: rgba(255, 190, 110, 0.32);
 }
 .our-work-card--green {
   --ow-bg:
-    radial-gradient(circle at 80% 15%, rgba(100, 230, 190, 0.16), transparent 35%),
-    linear-gradient(145deg, rgba(255, 255, 255, 0.98), rgba(226, 250, 240, 0.9));
-  --ow-deco: #5fd6a6;
-  --ow-tag-bg: #d2f3e2;
-  --ow-border: rgba(110, 220, 175, 0.3);
+    radial-gradient(circle at 82% 12%, rgba(120, 210, 245, 0.2), transparent 40%),
+    linear-gradient(160deg, rgba(234, 247, 255, 0.98), rgba(250, 253, 255, 0.96) 55%, rgba(222, 246, 240, 0.9));
+  --ow-deco: #6cc7ec;
+  --ow-accent: #3f9bf0;
+  --ow-tag-bg: #d8efff;
+  --ow-border: rgba(120, 190, 240, 0.42);
+  --ow-glow: rgba(110, 200, 240, 0.3);
 }
 .our-work-card--pink {
   --ow-bg:
-    radial-gradient(circle at 80% 15%, rgba(255, 160, 190, 0.17), transparent 35%),
-    linear-gradient(145deg, rgba(255, 255, 255, 0.98), rgba(255, 232, 239, 0.9));
-  --ow-deco: #ff9dbb;
-  --ow-tag-bg: #ffdce7;
-  --ow-border: rgba(255, 170, 195, 0.3);
+    radial-gradient(circle at 18% 12%, rgba(215, 170, 255, 0.22), transparent 40%),
+    linear-gradient(160deg, rgba(246, 236, 255, 0.98), rgba(253, 250, 255, 0.96) 55%, rgba(255, 232, 244, 0.9));
+  --ow-deco: #d9a5f0;
+  --ow-accent: #ee6fb0;
+  --ow-tag-bg: #f7dcf2;
+  --ow-border: rgba(220, 165, 235, 0.42);
+  --ow-glow: rgba(230, 160, 230, 0.3);
 }
 
 /* ================= 浮遊（カード全体）＋ 影の呼吸 ================= */
 .our-work-card {
-  --float-y: 7px;
-  --radius: 30px;
+  --float-y: 4px;
+  --radius: 24px;
   position: relative;
   height: 100%;
   border-radius: var(--radius);
-  animation: our-work-card-float 7s ease-in-out calc(var(--i, 0) * 0.7s) infinite;
+  animation: our-work-card-float 6s ease-in-out calc(var(--i, 0) * 0.6s) infinite;
 }
 /* 浮いた時だけ少し広がる影（浮遊と同じ周期） */
 .our-work-card::before {
@@ -98,7 +111,7 @@ defineProps({
   border-radius: inherit;
   box-shadow: 0 26px 52px rgba(29, 47, 78, 0.09);
   opacity: 0;
-  animation: our-work-card-shadow 7s ease-in-out calc(var(--i, 0) * 0.7s) infinite;
+  animation: our-work-card-shadow 6s ease-in-out calc(var(--i, 0) * 0.6s) infinite;
   pointer-events: none;
 }
 @keyframes our-work-card-float {
@@ -121,12 +134,14 @@ defineProps({
   border: 1px solid var(--ow-border);
   border-radius: var(--radius);
   box-shadow:
-    0 16px 40px rgba(29, 47, 78, 0.07),
-    0 4px 12px rgba(29, 47, 78, 0.04),
+    0 18px 40px rgba(30, 55, 90, 0.08),
+    0 6px 16px rgba(30, 55, 90, 0.05),
+    0 18px 36px -16px var(--ow-glow),
     inset 0 1px 0 rgba(255, 255, 255, 0.9);
   transition:
-    transform 0.45s cubic-bezier(0.2, 0.8, 0.2, 1),
-    box-shadow 0.45s cubic-bezier(0.2, 0.8, 0.2, 1);
+    transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1),
+    box-shadow 0.5s cubic-bezier(0.2, 0.8, 0.2, 1),
+    border-color 0.5s ease;
 }
 
 /* ---------- 装飾（よく見ると存在する程度。文字・画像より後ろ） ---------- */
@@ -219,6 +234,31 @@ defineProps({
   rotate: -40deg;
 }
 
+/* 下の柔らかい波（右下） */
+.our-work-card__wave {
+  left: 30%;
+  right: -20%;
+  bottom: -60px;
+  height: 120px;
+  border-radius: 60% 40% 0 0 / 80% 70% 0 0;
+  background: linear-gradient(100deg, transparent, var(--ow-deco));
+  opacity: 0.16;
+  rotate: -6deg;
+}
+/* 画像まわりの淡い光：左下 → 右上へゆっくり移動 */
+.our-work-card__glow {
+  left: 0;
+  top: 0;
+  width: 70%;
+  height: 55%;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, var(--ow-glow), transparent 70%);
+  animation: our-work-glow 12s ease-in-out calc(var(--i, 0) * -4s) infinite;
+}
+@keyframes our-work-glow {
+  0%, 100% { transform: translate3d(-6%, 22%, 0) scale(0.95); opacity: 0.7; }
+  50% { transform: translate3d(40%, -6%, 0) scale(1.05); opacity: 1; }
+}
 @keyframes our-work-blob {
   0%, 100% { scale: 1; translate: 0 0; }
   50% { scale: 1.03; translate: -4px -3px; }
@@ -241,8 +281,8 @@ defineProps({
 }
 .our-work-card__image-zoom {
   position: absolute;
-  inset: 20px 22px 6px;
-  transition: transform 0.45s cubic-bezier(0.2, 0.8, 0.2, 1);
+  inset: 14px 14px 2px;
+  transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 .our-work-card__image-float {
   display: flex;
@@ -250,11 +290,11 @@ defineProps({
   justify-content: center;
   width: 100%;
   height: 100%;
-  animation: our-work-image-float 6s ease-in-out calc(var(--i, 0) * -2s) infinite;
+  animation: our-work-image-float 7.2s ease-in-out calc(var(--i, 0) * -2s - 1.5s) infinite;
 }
 @keyframes our-work-image-float {
-  0%, 100% { transform: translateY(0) scale(1); }
-  50% { transform: translateY(-5px) scale(1.008); }
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
 }
 
 /* ---------- 文字：タイトル → 説明 → タグ ---------- */
@@ -266,6 +306,29 @@ defineProps({
   flex: 1;
   padding: 20px 22px 28px;
 }
+/* タイトル上の短いライン：中を細い光が左 → 右へゆっくり流れる */
+.our-work-card__accent {
+  position: relative;
+  display: block;
+  width: 44px;
+  height: 4px;
+  margin-bottom: 12px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--ow-accent), color-mix(in srgb, var(--ow-accent) 55%, #ffffff));
+  overflow: hidden;
+}
+.our-work-card__accent::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.9), transparent);
+  transform: translateX(-120%);
+  animation: our-work-accent-sweep 3s ease-in-out calc(var(--i, 0) * 0.35s) infinite;
+}
+@keyframes our-work-accent-sweep {
+  0% { transform: translateX(-120%); }
+  45%, 100% { transform: translateX(120%); }
+}
 .our-work-card__title {
   color: var(--color-navy);
   font-size: clamp(1.3125rem, 1rem + 0.45vw, 1.75rem);
@@ -276,6 +339,8 @@ defineProps({
 .our-work-card__description {
   margin-top: 12px;
   color: var(--color-navy-soft);
+  word-break: keep-all; /* \n（<wbr>）の位置でだけ改行する */
+  overflow-wrap: anywhere;
   font-size: 0.9375rem;
   font-weight: 400;
   line-height: 1.85;
@@ -284,29 +349,35 @@ defineProps({
 .our-work-card__tags {
   display: flex;
   flex-wrap: wrap;
-  gap: 7px;
+  gap: 6px;
   margin-top: auto;
   padding-top: 22px;
 }
 .our-work-card__tag {
-  padding: 6px 12px;
-  border-radius: 12px;
+  padding: 6px 11px;
+  border-radius: 999px;
   background: var(--ow-tag-bg);
   color: #274b82;
   font-size: 0.8125rem;
   font-weight: 600;
   line-height: 1.4;
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.7); /* 背景の装飾と重なっても形が分かるように */
+  transition: translate 0.3s ease;
 }
 
 /* ---------- PC（マウス操作）の hover ---------- */
 @media (hover: hover) and (pointer: fine) {
   .our-work-card:hover .our-work-card__surface {
-    transform: translateY(-10px);
+    transform: translateY(-5px);
+    border-color: color-mix(in srgb, var(--ow-accent) 45%, transparent);
     box-shadow:
-      0 26px 56px rgba(29, 47, 78, 0.11),
-      0 8px 18px rgba(29, 47, 78, 0.05),
+      0 24px 50px rgba(30, 55, 90, 0.11),
+      0 8px 18px rgba(30, 55, 90, 0.06),
+      0 22px 42px -14px var(--ow-glow),
       inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  }
+  .our-work-card__tag:hover {
+    translate: 0 -1px;
   }
   .our-work-card:hover .our-work-card__image-zoom {
     transform: scale(1.02);
@@ -319,8 +390,8 @@ defineProps({
 /* ---------- SP：浮遊を弱く、装飾を減らす ---------- */
 @media (max-width: 767px) {
   .our-work-card {
-    --float-y: 3px;
-    --radius: 26px;
+    --float-y: 2px;
+    --radius: 22px;
   }
   .our-work-card__content {
     padding: 18px 22px 24px;
@@ -335,8 +406,15 @@ defineProps({
   .our-work-card,
   .our-work-card::before,
   .our-work-card__image-float,
-  .our-work-card__deco > * {
+  .our-work-card__deco > *,
+  .our-work-card__accent::after {
     animation: none;
+  }
+  .our-work-card__accent::after {
+    display: none;
+  }
+  .our-work-card__tag {
+    transition: none;
   }
   .our-work-card__surface,
   .our-work-card__image-zoom,
