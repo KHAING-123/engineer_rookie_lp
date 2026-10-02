@@ -1,23 +1,31 @@
 <script setup>
+import { ref } from 'vue'
+import { useHeadingReveal } from '../../composables/useHeadingReveal.js'
 import { lpContent } from '../../data/lpContent.js'
 import { img } from '../../utils/image.js'
 import SectionHeading from './SectionHeading.vue'
 import IllustrationFrame from '../common/IllustrationFrame.vue'
 
 const { supportSection: section, supportItems } = lpContent
+
+// タイトル（04 / SUPPORT / 見出し）の Scroll Animation：左から1回だけ → その後に既存コンテンツ（01〜03 と共通処理）
+const heading = ref(null)
+const { stateClass } = useHeadingReveal(heading)
 </script>
 
 <template>
-  <section id="support" class="support lp-section lp-section--cream" aria-labelledby="support-title">
+  <section id="support" class="support lp-section lp-section--cream heading-reveal-scope" :class="stateClass" aria-labelledby="support-title">
     <img class="lp-deco support__dots" :src="img('common/deco-dots.svg')" alt="" aria-hidden="true" />
 
     <div class="lp-container">
       <SectionHeading
+        ref="heading"
         id="support-title"
         :number="section.number"
         :label="section.label"
         :title="section.title"
         :lead="section.lead"
+        slide-in
       />
 
       <div class="support__grid">
@@ -27,7 +35,7 @@ const { supportSection: section, supportItems } = lpContent
             v-for="(item, index) in supportItems"
             :key="item.title"
             v-reveal="{ delay: 100, i: index }"
-            class="support__item"
+            class="support__item heading-reveal-content heading-reveal-content--card"
           >
             <div class="support__float" :class="`support__float--${index % 4}`">
               <div class="support-card lp-card" :class="`accent-${item.accent || 'yellow'}`">
@@ -41,7 +49,7 @@ const { supportSection: section, supportItems } = lpContent
           </li>
         </ul>
 
-        <figure v-reveal="{ variant: 'right', delay: 200 }" class="support__visual">
+        <figure v-reveal="{ variant: 'right', delay: 200 }" class="support__visual heading-reveal-content heading-reveal-content--card">
           <span class="lp-blob lp-blob--yellow support__visual-blob" aria-hidden="true"></span>
           <!-- 画像は共通の表示枠（背景透過PNG推奨）。後ろの丸い背景はCSSの装飾 -->
           <!-- 外側(figure)：スクロール表示 / 中間：浮遊アニメーション / 内側：画像枠 -->

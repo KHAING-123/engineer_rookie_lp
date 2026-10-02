@@ -2,6 +2,7 @@
 import { ref, watch, onMounted, onBeforeUnmount, nextTick } from 'vue'
 import { lpContent } from '../../data/lpContent.js'
 import { img } from '../../utils/image.js'
+import PreaiLogo from '../common/PreaiLogo.vue'
 
 const { header, site } = lpContent
 const isOpen = ref(false)
@@ -65,7 +66,7 @@ onBeforeUnmount(() => {
 
     <div class="site-header__inner">
       <a class="site-header__logo" href="#top" @click="closeMenu()">
-        <img :src="img(site.logo)" :alt="site.logoAlt" width="150" height="40" />
+        <PreaiLogo class="site-header__logo-mark" :label="site.logoAlt" />
       </a>
 
       <!-- PCナビ：英字 → 日本語 → 色付きの短いライン -->
@@ -284,10 +285,8 @@ onBeforeUnmount(() => {
   justify-self: start;
   display: block;
 }
-.site-header__logo img {
-  display: block;
-  width: clamp(130px, 11vw, 168px);
-  height: auto;
+.site-header__logo-mark {
+  width: clamp(65px, 5.5vw, 84px); /* 従来 clamp(130px, 11vw, 168px) の 50% */
 }
 .site-header__end {
   justify-self: end;
@@ -995,8 +994,8 @@ onBeforeUnmount(() => {
   }
 }
 @media (max-width: 600px) {
-  .site-header__logo img {
-    width: 112px;
+  .site-header__logo-mark {
+    width: 56px; /* 従来 112px の 50% */
   }
   .drawer {
     width: 100%;

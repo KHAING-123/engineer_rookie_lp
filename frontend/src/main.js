@@ -7,5 +7,6 @@ import './assets/styles/base.css'
 import './assets/styles/lp.css'
 import './assets/styles/ambient.css'
 import './assets/styles/reveal.css'
+import './assets/styles/heading-reveal.css'
 
 createApp(App).use(reveal).mount('#app')

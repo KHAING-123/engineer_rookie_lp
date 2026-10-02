@@ -11,9 +11,12 @@ import SelectionFlowSection from './components/lp/SelectionFlowSection.vue'
 import FinalCtaSection from './components/lp/FinalCtaSection.vue'
 import AppFooter from './components/lp/AppFooter.vue'
 import AmbientBackground from './components/common/AmbientBackground.vue'
+import PageOpening from './components/common/PageOpening.vue'
 </script>
 
 <template>
+  <!-- ページを開いたときの紙がめくれる演出（不要になったらこの1行を消すだけ） -->
+  <PageOpening />
   <div class="lp-page">
     <a class="skip-link" href="#main">本文へスキップ</a>
     <AppHeader />

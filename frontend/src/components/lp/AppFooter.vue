@@ -1,6 +1,7 @@
 <script setup>
 import { lpContent } from '../../data/lpContent.js'
 import { img } from '../../utils/image.js'
+import PreaiLogo from '../common/PreaiLogo.vue'
 
 const { footer, site } = lpContent
 </script>
@@ -9,7 +10,7 @@ const { footer, site } = lpContent
   <footer class="site-footer">
     <div v-reveal="{ variant: 'fade' }" class="lp-container site-footer__inner">
       <a class="site-footer__logo" href="#top">
-        <img :src="img(site.logo)" :alt="`${site.logoAlt} トップへ戻る`" width="150" height="40" />
+        <PreaiLogo class="site-footer__logo-mark" :label="`${site.logoAlt} トップへ戻る`" />
       </a>
 
       <nav class="site-footer__nav" aria-label="フッターメニュー">
@@ -44,8 +45,14 @@ const { footer, site } = lpContent
   gap: 24px;
   padding-block: 40px;
 }
-.site-footer__logo img {
-  width: 150px;
+.site-footer__logo-mark {
+  width: 75px; /* 従来 150px の 50% */
+}
+/* ロゴは小さくしても、リンク・SNS の位置が変わらないよう従来のロゴ幅（150px）の枠を確保（ロゴは左端） */
+@media (min-width: 768px) {
+  .site-footer__logo {
+    width: 150px; /* 以前と同じく、狭い幅では詰まって縮む */
+  }
 }
 .site-footer__nav ul {
   display: flex;

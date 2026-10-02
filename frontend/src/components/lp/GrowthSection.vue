@@ -1,30 +1,38 @@
 <script setup>
+import { ref } from 'vue'
+import { useHeadingReveal } from '../../composables/useHeadingReveal.js'
 import { lpContent } from '../../data/lpContent.js'
 import { img } from '../../utils/image.js'
 import SectionHeading from './SectionHeading.vue'
 
 const { growthSection: section, growthSteps } = lpContent
+
+// タイトル（03 / GROWTH STEP / 見出し）の Scroll Animation：左から1回だけ → 説明文 → Note → STEP カード（01・02 と共通処理）
+const heading = ref(null)
+const { stateClass } = useHeadingReveal(heading)
 </script>
 
 <template>
-  <section id="growth" class="growth lp-section lp-section--white" aria-labelledby="growth-title">
+  <section id="growth" class="growth lp-section lp-section--white heading-reveal-scope" :class="stateClass" aria-labelledby="growth-title">
     <span class="lp-blob lp-blob--pink growth__blob-1" aria-hidden="true"></span>
     <span class="lp-blob lp-blob--yellow growth__blob-2" aria-hidden="true"></span>
 
     <div class="lp-container growth__grid">
       <div class="growth__intro">
         <SectionHeading
+          ref="heading"
           id="growth-title"
           :number="section.number"
           :label="section.label"
           :title="section.title"
           :lead="section.lead"
+          slide-in
         />
         <!--
           手書き風メモ「未経験から、できるを増やそう。」
           外側：スクロール表示（1回だけ） / 内側：ずっと続くループアニメーション（完全に分離）
         -->
-        <div v-if="section.note" v-reveal="{ delay: 200 }" class="growth-note-wrap">
+        <div v-if="section.note" v-reveal="{ delay: 200 }" class="growth-note-wrap heading-reveal-content">
           <div class="growth-note">
             <!-- 淡いパステル背景（ゆっくり動く） -->
             <span class="growth-note__bg" aria-hidden="true"><span class="growth-note__bg-inner"></span></span>
@@ -74,7 +82,7 @@ const { growthSection: section, growthSteps } = lpContent
           v-for="(item, index) in growthSteps"
           :key="item.step"
           v-reveal="{ delay: 100, i: index }"
-          class="timeline__item"
+          class="timeline__item heading-reveal-content heading-reveal-content--card"
           :class="`accent-${item.accent || 'yellow'}`"
         >
           <div class="timeline__marker">
@@ -103,7 +111,10 @@ const { growthSection: section, growthSteps } = lpContent
 }
 .growth__intro {
   position: sticky;
-  top: calc(var(--header-height) + 40px);
+  /* タイトル〜説明文〜Note をまとめて少し上へ（STEP カードの位置は変えない。transform は使わない）
+     通常位置は margin-top、スクロールで止まる位置は top を同じだけ上げる（元は +40px） */
+  top: calc(var(--header-height) + 12px);
+  margin-top: -28px;
 }
 /* ================= 手書き風メモ「未経験から、できるを増やそう。」 ================= */
 /* 説明文の下に置き、右寄せ（PC は見出し・説明文の列の右端、1列表示ではコンテナの右端） */
@@ -487,6 +498,9 @@ const { growthSection: section, growthSteps } = lpContent
   }
 }
 @media (max-width: 767px) {
+  .growth__intro {
+    margin-top: -15px;
+  }
   /* SP：動きを約25%小さく */
   .timeline__item {
     --card-float: 3.5px;

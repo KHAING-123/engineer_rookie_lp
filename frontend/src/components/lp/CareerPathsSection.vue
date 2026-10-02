@@ -1,32 +1,40 @@
 <script setup>
+import { ref } from 'vue'
+import { useHeadingReveal } from '../../composables/useHeadingReveal.js'
 import { lpContent } from '../../data/lpContent.js'
 import { img } from '../../utils/image.js'
 import SectionHeading from './SectionHeading.vue'
 import CareerCard from './CareerCard.vue'
 
 const { careersSection: section, careers } = lpContent
+
+// タイトル（05 / CAREER PATH / 見出し）の Scroll Animation：左から1回だけ → その後に既存コンテンツ（01〜03 と共通処理）
+const heading = ref(null)
+const { stateClass } = useHeadingReveal(heading)
 </script>
 
 <template>
-  <section id="careers" class="careers lp-section lp-section--white" aria-labelledby="careers-title">
+  <section id="careers" class="careers lp-section lp-section--white heading-reveal-scope" :class="stateClass" aria-labelledby="careers-title">
     <span class="lp-blob lp-blob--blue careers__blob-1" aria-hidden="true"></span>
     <span class="lp-blob lp-blob--green careers__blob-2" aria-hidden="true"></span>
     <img class="lp-deco careers__leaf" :src="img('common/deco-leaf-pair.svg')" alt="" aria-hidden="true" />
 
     <div class="lp-container">
       <SectionHeading
+        ref="heading"
         id="careers-title"
         :number="section.number"
         :label="section.label"
         :title="section.title"
         :lead="section.lead"
         align="center"
+        slide-in
       />
       <!--
         手書き風メモ「なりたい自分を、ここからみつけよう。」
         外側：スクロール表示（1回） / 中：ずっと続く浮遊 / 内：文字と装飾（それぞれ別の周期でループ）
       -->
-      <div v-if="section.note" v-reveal="{ delay: 150 }" class="career-note-reveal">
+      <div v-if="section.note" v-reveal="{ delay: 150 }" class="career-note-reveal heading-reveal-content heading-reveal-content--note">
         <div class="career-note-float">
           <div class="career-note">
             <!-- 背景：淡い黄・ミントのブラシ＋ピンクの光（四角いカードにはしない） -->
@@ -62,9 +70,9 @@ const { careersSection: section, careers } = lpContent
       </div>
 
       <div class="careers__track">
-        <span v-reveal="{ variant: 'fade', delay: 100 }" class="careers__line" aria-hidden="true"></span>
+        <span v-reveal="{ variant: 'fade', delay: 100 }" class="careers__line heading-reveal-content" aria-hidden="true"></span>
         <ul class="careers__list">
-          <li v-for="(career, index) in careers" :key="career.title" v-reveal="{ delay: 100, i: index }">
+          <li v-for="(career, index) in careers" :key="career.title" v-reveal="{ delay: 100, i: index }" class="heading-reveal-content heading-reveal-content--card">
             <CareerCard :career="career" :index="index" />
           </li>
         </ul>

@@ -98,7 +98,7 @@ export const lpContent = {
       previousJob: '飲食店スタッフ',
       currentRole: 'モバイルアプリエンジニア',
       comment: '自分が作ったアプリが動いた瞬間の感動は今でも忘れられません。',
-      accent: 'yellow',
+      accent: 'pink',
     },
     {
       name: 'M.N',
@@ -295,13 +295,45 @@ export const lpContent = {
     imageAlt: '面接官と応募者が笑顔で会話しているイラスト',
     note: 'リラックスして\nお話ください。', // イラストの右下に添える手書き風メモ（\n で改行）
     listTitle: '面接でお話しすること',
+    /*
+     * 「面接でお話しすること」（2×2で表示：左上 → 右上 → 左下 → 右下 の順）
+     *  title: 項目名（\n は「幅が足りないときだけ改行する位置」） / description: 説明文（\n で改行） / icon: アイコン画像 / accent: アイコンの後ろの丸の色（'green' / 'pink' / 'blue' / 'yellow'）
+     */
     topics: [
-      'これまでのご経験・学習状況について',
-      'PREAIでやってみたいこと',
-      '今後のキャリアの希望',
-      'その他ざっくばらんにお話しましょう',
+      {
+        title: 'あなたらしさについて',
+        description: '得意なことや大切にしている\nことを教えてください。',
+        icon: 'icons/interview/interview-learning.svg',
+        accent: 'green',
+      },
+      {
+        title: 'チームでの働き方\nについて',
+        description: '周りの人とどのように\n関わって仕事をしたいかを\nお聞きします。',
+        icon: 'icons/interview/interview-career.svg',
+        accent: 'pink',
+      },
+      {
+        title: '仕事への向き合い方\nについて',
+        description: '仕事をするうえで\n大切にしたいことを\n教えてください。',
+        icon: 'icons/interview/interview-idea.svg',
+        accent: 'blue',
+      },
+      {
+        title: '気になること・\n聞いてみたいこと',
+        description: '仕事内容や働き方など、\n何でも質問してください。',
+        icon: 'icons/interview/interview-talk.svg',
+        accent: 'yellow',
+      },
     ],
-    points: ['服装自由', 'オンライン面接OK', '逆質問大歓迎'],
+    /*
+     * 下の3つのポイント
+     *  title / description / icon / accent: カードの色（'yellow' / 'blue' / 'green'）
+     */
+    points: [
+      { title: '服装自由', description: 'いつものスタイルでOKです', icon: 'icons/interview/point-clothes.svg', accent: 'yellow' },
+      { title: 'オンライン面接OK', description: 'ご自宅からでも参加できます', icon: 'icons/interview/point-online.svg', accent: 'blue' },
+      { title: '逆質問大歓迎', description: '気になることもお気軽にどうぞ', icon: 'icons/interview/point-question.svg', accent: 'green' },
+    ],
   },
 
   /* ---------- 07 選考の流れ ---------- */
@@ -316,7 +348,7 @@ export const lpContent = {
    * 選考の流れ（左から順に表示）
    *  duration: 丸の下に（ ）付きで表示する日数
    *  note:     黄色いメモとして表示する文章（最後の「内定」など。不要なら消してOK）
-   *  circle:   アイコンの後ろの丸の色（'blue' / 'yellow' / 'lavender' / 'pink' / 'green'）
+   *  circle:   丸・STEP名の色（'blue' / 'yellow' / 'sky' / 'lavender' / 'pink' / 'green'）
    *  description は現在のデザインでは表示していません
    */
   selectionFlow: [
@@ -339,7 +371,7 @@ export const lpContent = {
       duration: '1〜2日',
       description: '現場メンバーとの面接（1〜2回）',
       icon: 'icons/selection/selection-interview.png',
-      circle: 'blue',
+      circle: 'sky',
     },
     {
       title: '条件確認',

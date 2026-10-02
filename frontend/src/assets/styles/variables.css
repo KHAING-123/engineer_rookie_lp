@@ -55,6 +55,7 @@
   --space-lg: 40px;
   --space-xl: 64px;
   --section-padding: clamp(64px, 5vw + 40px, 120px);
+  --section-padding-top-heading: clamp(40px, 2vw + 32px, 62px); /* タイトルを上寄せするセクションの上余白（01 / 02） */
 
   /* ---- 角丸 ---- */
   --radius-sm: 8px;
